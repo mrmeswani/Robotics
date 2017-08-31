@@ -12,17 +12,19 @@ def decision_step(Rover):
     
     avg_angle = np.mean(Rover.nav_angles * 180/np.pi) 
     len_angle = len(Rover.nav_angles)
-    blocked=0
     avg_dist = np.mean(Rover.nav_dists) 
     
     # Check if we have vision data to make decisions with
     if Rover.nav_angles is not None:
         # Detect if we are stuck; should be when we are not moving and not picking up any rock samples 
-        if Rover.vel <= 0.1 and not Rover.picking_up and not Rover.near_sample:
-            Rover.mode = 'stop'
-            Rover.halted +=1
+        if abs(Rover.vel) < 0.02 and not Rover.picking_up and not Rover.near_sample :            
+            Rover.halted += 1
         else:
             Rover.halted = 0
+        
+        if Rover.halted > 2:
+                Rover.mode = 'stop' # we have been blocked for a while lets take action to get out
+
             
         # Check for Rover.mode status
         if Rover.mode == 'forward': 
@@ -36,26 +38,29 @@ def decision_step(Rover):
                 else: # Else coast
                     Rover.throttle = 0
                 Rover.brake = 0
+                
                 # Set steering to average angle clipped to the range +/- 15
                 # Hug the wall to the right or to the left 
-  
-                if len_angle > 3000:
-                    goal = 30
-                    if Rover.vel < Rover.max_vel:
-                        Rover.throttle = 1
-                elif len_angle < 1000:
-                    goal = 10
-                else:
-                    goal = 20
-                if avg_angle < 0:
-                    goal = goal*-1
-                if avg_angle == goal:
-                    Rover.steer = 0
-                else:
-                    Rover.steer = -1*np.clip(goal - avg_angle, -15,15)
- 
-
-                #Rover.steer = np.clip(np.mean(Rover.nav_angles * 180/np.pi), -15, 15)
+                # The target for steering is set based on the width the navigatable terrain 
+                if Rover.vel > 0.2: # if we are moving at ok speed, lets try to stay close to the wall
+                    if len_angle > 3000:  # this is the case when the terrain is wide 
+                        goal = 30
+                        if Rover.vel < Rover.max_vel:
+                            Rover.throttle = 1
+                    elif len_angle < 1000: # this is a narrow terrain
+                        goal = 10
+                    else: # this is the case if its average width terrain 
+                        goal = 20
+                    # adjust the goal depending on if wall is on right or left side
+                    if avg_angle < 0:
+                        goal = goal*-1
+                    # if we are already hugging the wall dont steer
+                    if avg_angle == goal:
+                        Rover.steer = 0
+                    else:
+                        Rover.steer = -1*np.clip(goal - avg_angle, -15,15)
+                else: # if we are slow then maybe we are too close to wall, lets just go to the median
+                    Rover.steer = np.clip(np.mean(Rover.nav_angles * 180/np.pi), -15, 15)
                 #angle_adjust = np.random.random_sample()*5
                 #Rover.steer = np.clip(np.mean(Rover.nav_angles * 180/np.pi)+angle_adjust, -15, 15)
             # If there's a lack of navigable terrain pixels then go to 'stop' mode
@@ -70,32 +75,28 @@ def decision_step(Rover):
         # If we're already in "stop" mode then make different decisions
         elif Rover.mode == 'stop':
             # If we're in stop mode but still moving keep braking
-            if Rover.vel > 0.2:
+            if abs(Rover.vel) > 0.2:
                 Rover.throttle = 0
                 Rover.brake = Rover.brake_set
                 Rover.steer = 0
             # If we're not moving (vel < 0.2) then do something else
-            elif Rover.vel <= 0.2:
+            elif abs(Rover.vel) <= 0.2:
                 Rover.throttle = 0
                 # Release the brake to allow turning
                 Rover.brake = 0
 
                 # Now we're stopped and we have vision data to see if there's a path forward
-                if len(Rover.nav_angles) < Rover.go_forward or Rover.halted > 1:
-                    if len(Rover.obs_angles) > 10*len(Rover.nav_angles): # if we see mostly obstacle then reverse
-                        Rover.throttle = -0.1* np.random.randint(0,10)
+                if (len(Rover.nav_angles) < Rover.go_forward) or Rover.halted:
+                    if Rover.halted > 5 and Rover.halted < 50: # go reverse out of a bad blocked state, if its too bad (>50) lets just do a full turn
+                        Rover.throttle = -0.1* np.random.randint(1,10)
 
                     # Turn range is +/- 15 degrees, when stopped the next line will induce 4-wheel turning
-                    if Rover.throttle == 0:
-
-                        if (np.mean(Rover.nav_angles * 180/np.pi)) > 0 :
-                            Rover.steer = 15
-                        else :
-                            Rover.steer = -15
+                    else: 
+                        Rover.steer = -15
                     
                     #Rover.steer = -15 # Could be more clever here about which way to turn
                 # If we're stopped but see sufficient navigable terrain and too many obstacles in front then go!
-                if len(Rover.nav_angles) >= Rover.go_forward:
+                if len(Rover.nav_angles) >= Rover.go_forward and not Rover.halted:
                     # Set throttle back to stored value
                     if Rover.throttle == 0:
                         Rover.throttle = Rover.throttle_set
