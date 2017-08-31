@@ -128,16 +128,16 @@ def create_output_images(Rover):
       # Flip the map for plotting so that the y-axis points upward in the display
       map_add = np.flipud(map_add).astype(np.float32)
       # Add some debug statements
-      cv2.putText(map_add,"Len Angle: "+str(len(Rover.nav_angles)), (0, 100), 
-                  cv2.FONT_HERSHEY_COMPLEX, 0.4, (255, 255, 255), 1)     
-      cv2.putText(map_add,"Avg Angle: "+str(np.mean(Rover.nav_angles * 180/np.pi)), (0, 115), 
-                  cv2.FONT_HERSHEY_COMPLEX, 0.4, (255, 255, 255), 1) 
-      cv2.putText(map_add,"Len ObsAngle: "+str(len(Rover.obs_angles)), (0, 130), 
-                  cv2.FONT_HERSHEY_COMPLEX, 0.4, (255, 255, 255), 1)     
-      cv2.putText(map_add,"Avg ObbsAngle: "+str(np.mean(Rover.obs_angles * 180/np.pi)), (0, 145), 
-                  cv2.FONT_HERSHEY_COMPLEX, 0.4, (255, 255, 255), 1) 
-      cv2.putText(map_add,"Avg dist: "+str(np.mean(Rover.nav_dists)), (0, 160), 
-                  cv2.FONT_HERSHEY_COMPLEX, 0.4, (255, 255, 255), 1)
+     # cv2.putText(map_add,"Len Angle: "+str(len(Rover.nav_angles)), (0, 100), 
+     #             cv2.FONT_HERSHEY_COMPLEX, 0.4, (255, 255, 255), 1)     
+     # cv2.putText(map_add,"Avg Angle: "+str(np.mean(Rover.nav_angles * 180/np.pi)), (0, 115), 
+     #             cv2.FONT_HERSHEY_COMPLEX, 0.4, (255, 255, 255), 1) 
+     # cv2.putText(map_add,"Len ObsAngle: "+str(len(Rover.obs_angles)), (0, 130), 
+     #             cv2.FONT_HERSHEY_COMPLEX, 0.4, (255, 255, 255), 1)     
+     # cv2.putText(map_add,"Avg ObbsAngle: "+str(np.mean(Rover.obs_angles * 180/np.pi)), (0, 145), 
+     #             cv2.FONT_HERSHEY_COMPLEX, 0.4, (255, 255, 255), 1) 
+     # cv2.putText(map_add,"Avg dist: "+str(np.mean(Rover.nav_dists)), (0, 160), 
+     #             cv2.FONT_HERSHEY_COMPLEX, 0.4, (255, 255, 255), 1)
       # Add some text about map and rock sample detection results
       cv2.putText(map_add,"Time: "+str(np.round(Rover.total_time, 1))+' s', (0, 10), 
                   cv2.FONT_HERSHEY_COMPLEX, 0.4, (255, 255, 255), 1)
