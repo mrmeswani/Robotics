@@ -83,6 +83,16 @@ class RoverState():
         self.near_sample = 0 # Will be set to telemetry value data["near_sample"]
         self.picking_up = 0 # Will be set to telemetry value data["picking_up"]
         self.send_pickup = False # Set to True to trigger rock pickup
+        self.Debug=0 # Debug mode, defaults to false
+        self.perc_mapped = 0
+        self.fidelity = 0
+        self.prev_pos = 0 # prev pos
+        self.prev_yaw = 0 # prev yaw
+        self.clockwisecount = 0
+        self.anticlockwisecount = 0
+        self.prev_perc_mapped = 0
+        self.nomap_count = 0 # How many samples we are not mapping
+
 # Initialize our rover 
 Rover = RoverState()
 
@@ -109,8 +119,13 @@ def telemetry(sid, data):
 
     if data:
         global Rover
+       
+        Rover.prev_pos = Rover.pos # save prev pos before getting current data
+        Rover.prev_yaw = Rover.yaw
+        Rover.prev_perc_mapped = Rover.perc_mapped
         # Initialize / update Rover with current telemetry
         Rover, image = update_rover(Rover, data)
+
 
         if np.isfinite(Rover.vel):
 
@@ -197,6 +212,9 @@ if __name__ == '__main__':
         default='',
         help='Path to image folder. This is where the images from the run will be saved.'
     )
+    parser.add_argument(
+        '-debug',
+        action='store_true')
     args = parser.parse_args()
     
     #os.system('rm -rf IMG_stream/*')
@@ -210,7 +228,12 @@ if __name__ == '__main__':
         print("Recording this run ...")
     else:
         print("NOT recording this run ...")
-    
+    if args.debug :
+        print("Debug mode enabled")
+        Rover.Debug = 1
+    else:
+        print("Debug mode if OFF")
+        Rover.Debug = 0
     # wrap Flask application with socketio's middleware
     app = socketio.Middleware(sio, app)
 
