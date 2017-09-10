@@ -71,20 +71,21 @@ The simulator was run with *1024 X 768* resolution and graphics quality was set 
 This step does all the analysis required for making decisions. Specificall it identifies obstacles, rocks, and navigatable terrain. To aid some decisions in the Rover class I added also dist and angles for obstacles and rocks. The perception step pretty much uses the thresholding functions from the Notebook and with one change, I give a bit more emphasis to navigatable terrain on the world map.  To improve the fidelity I discard images that have high pitch and roll as they indicate the rover may have been bouncing or other wise unstable. 
  
 ##Decision
-I attempted to identify when the rover was blocked in front of an obstacle. The first if statement does that by checking if the rover is not near a rock sample and not picking up and its velocity is almost zero then I increment a counter of how many samples we are in halted state, experimentally i set it to two. If i crossed this threshold i tranistion the rover state to stop. In this step the velocity of zero did not result in good results and so I played around with it and settled on 0.02 value. Hence, if the rover speed is < 0.02 and its not near a rock sample or picking it up I detect that state to be a blocked state.  
+I added two more modes to the Rover: circles and stuck. I detect the rover is going in circles if it completes a 360 circle (clockwise or anitclockwise) based on the changes in yaw angle. I identify the rover is stuck if its speed ~0 or dist travelled ~0. Depending on these conditions i take different actions.   
 
-Next i modified the rover forward mode to try and hug the right side or left side of the wall. By trial and error i settled on choosing the desired angle the rover should try to adjust its steering. 
+Next i modified the rover forward mode to try and hug the left side of the wall. I noted that approx angles i needed to maintain was correlated and adjusted to the width of the terrain and adjusted steering angles accordingly.  
 
-Finally I modified the rover stop mode to take different action if its halted. If i find that I have only mostly obstacle in front of the rover, i do a reverse throttle. I tried to do some analysis of how much to reverse throttle back because no single value was always correct (too slow or too fast). I did not come up with a set of conditions so i decided to reverse throttle to get out of the blocked area.  Next in the stopped state if we detect that there is sufficient navigatable terrain and my throttle is zero then i throttle the rover forward; this helped in situations when I found that when speed was zero, and condition was stopped the rover would start moving if it could. 
+ 
 
 #### 2. Launching in autonomous mode your rover can navigate and map autonomously.  Explain your results and how you might improve them in your writeup.  
 
 **Note: running the simulator with different choices of resolution and graphics quality may produce different results, particularly on different machines!  Make a note of your simulator settings (resolution and graphics quality set on launch) and frames per second (FPS output to terminal by `drive_rover.py`) in your writeup when you submit the project so your reviewer can reproduce your results.**
 
-Mostly the issue with the decision process is to detect blocked state where the rover needs to move out of a difficult obsstacle, or a corner. I tried to address this situation experimentally, but if given time I would like to have come up with different blocked conditions and take appropriate actions.  
+The Rover is mostly successful in getting out of corners and blocked state in good time. If given the time, I would have liked to make the rover not visit previously mapped areas. 
 
 
 
 ![alt text][image3]
 
 
+z	

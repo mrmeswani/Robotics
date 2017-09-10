@@ -1,6 +1,15 @@
+# Files and folders 
+README.md - this file  
+INSTALL.md - installation notes  
+report.md  - project report  
+code - folder with the source code 
+
+This project was developed for the Udacity Robotics nano degree program. 
+
 [//]: # (Image References)
 [image_0]: ./misc/rover_image.jpg
 [![Udacity - Robotics NanoDegree Program](https://s3-us-west-1.amazonaws.com/udacity-robotics/Extra+Images/RoboND_flag.png)](https://www.udacity.com/robotics)
+
 # Search and Sample Return Project
 
 
