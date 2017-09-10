@@ -2,7 +2,7 @@
 README.md - this file  
 INSTALL.md - installation notes  
 report.md  - project report  
-code - folder with the source code 
+src - folder with the source code 
 
 This project was developed for the Udacity Robotics nano degree program. 
 
