@@ -27,7 +27,6 @@ def handle_calculate_IK(req):
         return -1
     else:
 		
-        ### Your FK code here
         # Create symbols
 	#
 	#  
@@ -36,7 +35,7 @@ def handle_calculate_IK(req):
 	a0,a1,a2,a3,a4,a5,a6 = symbols("a0:7")
 	alpha0, alpha1,alpha2,alpha3,alpha4,alpha5,alpha6 = symbols("alpha0:7")
  
-	# Create Modified DH parameters
+	# DH parameters
 	#
 	#
 	s = {	alpha0: 0, 	a0: 0,		d1: 0.75,	q1: q1,
@@ -115,7 +114,7 @@ def handle_calculate_IK(req):
               			[ 0,              0,         1]]) 
 
 	    ROT_EE = Rot_z*Rot_y*Rot_x
-            ### Your IK code here 
+            ### IK code 
 	    # Compensate for rotation discrepancy between DH parameters and Gazebo
 	    ROT_err = Rot_z.subs(y,radians(180)) * Rot_y.subs(p, radians(-90))
 	    ROT_EE = ROT_EE * ROT_err
@@ -126,11 +125,13 @@ def handle_calculate_IK(req):
 	    #
 	    #
 	    # Calculate joint angles using Geometric IK method
-	    #
-	    #
+	    # The first three joints form a trianlge wrt the wrist center
+	    # We can calculate the first three joint angles using cosine rules
             ###
 	    theta1 = atan2(WC[1], WC[0])
             
+            # Theta 2 and 3  can be derived using the triangle ABC we form with wrist center (WC)
+            # we define Triangle ABC with angles a b and c. Refer to the report.md for the actual figure
 	    side_a = 1.501
 	    side_b = sqrt(pow((sqrt(WC[0]*WC[0]+ WC[1]*WC[1]) - 0.35),2) + pow((WC[2] - 0.75),2))	
             side_c= 1.25
@@ -139,6 +140,7 @@ def handle_calculate_IK(req):
 	    angle_b = acos((side_a*side_a + side_c*side_c - side_b*side_b) / (2*side_a*side_c))
 	    angle_c = acos((side_a*side_a + side_b*side_b - side_c*side_c) / (2*side_a*side_b))
 
+            
             theta2 = pi/2 - angle_a - atan2(WC[2]-0.75, sqrt(WC[0]*WC[0] + WC[1]*WC[1]) - 0.35)
 	    theta3 = pi/2 - (angle_b + 0.036) 
 
@@ -146,11 +148,14 @@ def handle_calculate_IK(req):
 	    R0_3 = R0_3.evalf(subs={q1: theta1, q2: theta2, q3: theta3})
 
             R3_6 = R0_3.inv("LU") * ROT_EE
+           
+            # Since R0_6 = RotRPY (rotation matrix using roll pitch and yaw) and we know that R3_\6 = inv(R_3) * RotRPY. 
+            # We can solve this equation to get theta4-6 
             theta4 = atan2(R3_6[2,2], -R3_6[0,2])
 	    theta5 = atan2(sqrt(R3_6[0,2]*R3_6[0,2] + R3_6[2,2]*R3_6[2,2]), R3_6[1,2])
             theta6 = atan2(-R3_6[1,1], R3_6[1,0])
     	
-	    # Calc EE error 	
+	    # Calc EE error, this can be used to see how accurate our calculations are  	
 	    FK = T0_EE.evalf(subs={q1: theta1, q2:theta2, q3:theta3, q4:theta4, q5:theta5, q6:theta6})
             my_EE = [FK[0,3],FK[1,3],FK[2,3]]
             if not(sum(my_EE)==3):
@@ -158,7 +163,7 @@ def handle_calculate_IK(req):
                 err_y = abs(my_EE[1]-py)
                 err_z = abs(my_EE[2]-px)
                 err_offset = sqrt(err_x**2 + err_y**2 + err_z**2)
-                rospy.loginfo("err_offset %04.8f" % err_offset)
+                rospy.loginfo("err_offset %04.8f" % err_offset) # lets log the angle to stdout to get an idea how accuracy of our solution
 	    # Populate response for the IK request
 	    joint_trajectory_point.positions = [theta1, theta2, theta3, theta4, theta5, theta6]
 	    joint_trajectory_list.append(joint_trajectory_point)

@@ -9,7 +9,6 @@
 
 [image1]: ./FK.png
 [image2]: ./pic1.png
-[image3]: ./misc_images/misc2.png
 
 ## [Rubric](https://review.udacity.com/#!/rubrics/972/view) Points
 ## Note the code is included in ./kuka\_arm/scripts IK_server.py
