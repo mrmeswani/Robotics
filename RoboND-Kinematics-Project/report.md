@@ -10,6 +10,7 @@
 [image1]: ./FK.png
 [image2]: ./pic1.png
 
+
 ## [Rubric](https://review.udacity.com/#!/rubrics/972/view) Points
 ## Note the code is included in ./kuka\_arm/scripts IK_server.py
 
@@ -87,5 +88,8 @@ theta6 = atan2(-R3\_6[1,1], R3\_6[1,0])
 
 For the basic implementation I do see the solutions taking a bit longer which maybe due to the laptop I am running having limited resources and takes a few minutes to get the complete solution. I did calculate the Forward kinematics of my transformations and it appears to be within a reasonable error range. I did not howerver plot them and if given time I would both optimize to reduce the error and also try to make my code faster.
 
+Attached is a video of a pick and place operation. As you can see in the video my error is not zero, but still the robot kuka arm is successfully placing objects in the bin. Overall I observe  that it follows the plan albeit with some deviation. Since the matrix is square I sped up the code to to use transpose instead of the more computationally expensive LU decomposition.
+
+[![IMAGE ALT TEXT HERE](http://img.youtube.com/vi/kuUOJvRvXFk/0.jpg)](https://youtu.be/kuUOJvRvXFk)
 
 
