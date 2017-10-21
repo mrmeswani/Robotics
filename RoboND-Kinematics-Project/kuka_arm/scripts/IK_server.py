@@ -147,11 +147,15 @@ def handle_calculate_IK(req):
 	    R0_3 = T0_1[0:3,0:3] * T1_2[0:3,0:3] * T2_3[0:3,0:3]
 	    R0_3 = R0_3.evalf(subs={q1: theta1, q2: theta2, q3: theta3})
 
+            # Simce R0_3*T3_6 = ROT_EE, we can find numerical value of R3_6 = Inverse of R0_3 * ROT_EE
             #R3_6 = R0_3.inv("LU") * ROT_EE
             R3_6 = R0_3.transpose() * ROT_EE
-           
-            # Since R0_6 = RotRPY (rotation matrix using roll pitch and yaw) and we know that R3_\6 = inv(R_3) * RotRPY. 
-            # We can solve this equation to get theta4-6 
+          
+	    # Get the symbolic version of the R3_6
+	    #  R3_6_symb = T3_4[0:3,0:3] * T4_5[0:3,0:3] * T5_6[0:3,0:3]
+            # print (R3_6_symb)
+
+	    # we can equate R3_6_symb  = R3_6 and derive equations for theta 4-6
             theta4 = atan2(R3_6[2,2], -R3_6[0,2])
 	    theta5 = atan2(sqrt(R3_6[0,2]*R3_6[0,2] + R3_6[2,2]*R3_6[2,2]), R3_6[1,2])
             theta6 = atan2(-R3_6[1,1], R3_6[1,0])

@@ -9,6 +9,15 @@
 
 [image1]: ./FK.png
 [image2]: ./pic1.png
+[p1]: ./solutions/p1.jpg
+[p2]: ./solutions/p2.jpg
+[p3]: ./solutions/p3.jpg
+[p4]: ./solutions/p4.jpg
+[p5]: ./solutions/p5.jpg
+[p6]: ./solutions/p6.jpg
+[p7]: ./solutions/p7.jpg
+[p8]: ./solutions/p8.jpg
+[p9]: ./solutions/p9.jpg
 
 
 ## [Rubric](https://review.udacity.com/#!/rubrics/972/view) Points
@@ -74,9 +83,32 @@ For a spherical wrist, the first 3 joints determine the wrist position. The last
 
 Once we have the Rotation matrix from the roll pitch and yaw we can derive the wrist center using rotation matrix and end effector poses given by the planner. 
 We can then derive theta1 from wrist center. 
-To calculate theta2 and theta3 we using the ABC triangle above and use cosine laws to get the theta2 and theta3.  
 
-Since R0\_6 = RotRPY (rotation matrix using roll pitch and yaw) and we know that R3_\6 = inv(R\_3) * RotRPY. We can solve this equation to get theta4-6 shown below  	
+The first theta angle is simple derived be reflecting the wrist center to the x-y plane and then deriving the angle as shown. 
+![alt text][p1]  
+
+
+To calculate theta2 the triangle generate by joints 2, 3 and wrist center. For angle theta3 we need to consider the triangle joint 2,3,5 wrt wrist center as there is a subtle dip from joint 3 to joint 4 which we need to account for, the figures below show the equations we can derive to solve for theta2 and theta 3.
+![alt text][p2] 
+![alt text][p3] 
+![alt text][p4] 
+
+
+Once we have the theta angles we can derive the matrix R0_3 for the first three joints. 
+Since the total transform matrix cab be expressed as R0_3\*R3_6 = RotRPY, we can get the numeric solution to R3_6 = Inverse(R0_3)\*RotRPY. 
+I noticed that in my code that I can use the computationally less expensive transpose since R0_3 is a square matrix to make things go a bit faster.
+
+We can get the symbolic form of R3_6_symb = T3_4\*T4_5\*T5_6. 
+Now we can solve R3_6_symb = R3_6 for angles theta4-6 which is shown below.
+![alt text][p5]
+![alt text][p6] 
+![alt text][p7] 
+![alt text][p8] 
+![alt text][p9] 
+
+
+
+The final angles as derived above are:  	
 theta4 = atan2(R3\_6[2,2], -R3\_6[0,2])  
 theta5 = atan2(sqrt(R3\_6[0,2] * R3\_6[0,2] + R3\_6[2,2] * R3\_6[2,2]), R3\_6[1,2])  
 theta6 = atan2(-R3\_6[1,1], R3\_6[1,0])
