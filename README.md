@@ -4,4 +4,6 @@ This repo contains some projects for robotics. Read the license file for terms a
 The projects are  
 
 * RoboND-Rover-Project: Project for Robotics Nandodegree Term1 rover project 
+* RoboND-Kinematics-Project for pick and place project
+
 

@@ -145,7 +145,8 @@ def test_code(test_case):
 
     R3_6_symb = T3_4[0:3,0:3] * T4_5[0:3,0:3] * T5_6[0:3,0:3]
     print (R3_6_symb)
-    R3_6 = R0_3.inv("LU") * ROT_EE
+    #R3_6 = R0_3.inv("LU") * ROT_EE
+    R3_6 = R0_3.transpose() * ROT_EE
     theta4 = atan2(R3_6[2,2], -R3_6[0,2])
     theta5 = atan2(sqrt(R3_6[0,2]*R3_6[0,2] + R3_6[2,2]*R3_6[2,2]), R3_6[1,2])
     theta6 = atan2(-R3_6[1,1], R3_6[1,0])
