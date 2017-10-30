@@ -72,15 +72,22 @@ def pcl_callback(pcl_msg):
         passthrough = cloud_filtered.make_passthrough_filter()
         filter_axis = 'z'
         passthrough.set_filter_field_name(filter_axis)
-        axis_min = 0.5
-        axis_max = 1.2
+        axis_min = 0.6
+        axis_max = 0.9
         passthrough.set_filter_limits(axis_min, axis_max)
         cloud_filtered = passthrough.filter()
         passthrough = cloud_filtered.make_passthrough_filter()
         filter_axis = 'x'
         passthrough.set_filter_field_name(filter_axis)
-        axis_min = 0.3
+        axis_min = 0.35
         axis_max = 0.8
+        passthrough.set_filter_limits(axis_min, axis_max)
+        cloud_filtered = passthrough.filter()
+        passthrough = cloud_filtered.make_passthrough_filter()
+        filter_axis = 'y'
+        passthrough.set_filter_field_name(filter_axis)
+        axis_min = -0.45 
+        axis_max = 0.45
         passthrough.set_filter_limits(axis_min, axis_max)
         cloud_filtered = passthrough.filter()
 
@@ -181,15 +188,6 @@ def pcl_callback(pcl_msg):
 
         rospy.loginfo('Detected {} objects: {}'.format(len(detected_objects_labels), detected_objects_labels))
 
-        # Grab the points for the cluster
-
-        # Compute the associated feature vector
-
-        # Make the prediction
-
-        # Publish a label into RViz
-
-        # Add the detected object to the list of detected objects.
 
     # Publish the list of detected objects
         detected_objects_pub.publish(detected_objects)
@@ -198,7 +196,7 @@ def pcl_callback(pcl_msg):
     # Could add some logic to determine whether or not your object detections are robust
     # before calling pr2_mover()
     	try:
-    		pr2_mover(detected_objects_list)
+    		pr2_mover(detected_objects)
     	except rospy.ROSInterruptException:
         	pass
 
@@ -255,6 +253,13 @@ if __name__ == '__main__':
         pcl_cluster_pub = rospy.Publisher("/pcl_cluster", PointCloud2, queue_size=10)
 
     # TODO: Load Model From disk
+        model = pickle.load(open('model1.sav', 'rb'))
+        #model = pickle.load(open('model2.sav', 'rb'))
+        #model = pickle.load(open('model3.sav', 'rb'))
+        clf = model['classifier']
+        encoder = LabelEncoder()
+        encoder.classes_ = model['classes']
+        scaler = model['scaler']
 
 
     # Initialize color_list
