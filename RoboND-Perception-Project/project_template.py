@@ -115,9 +115,9 @@ def pcl_callback(pcl_msg):
 
     # TODO: Create Cluster-Mask Point Cloud to visualize each cluster separately
         ec = white_cloud.make_EuclideanClusterExtraction()
-        ec.set_ClusterTolerance(0.04)
-        ec.set_MinClusterSize(10)
-        ec.set_MaxClusterSize(5000)
+        ec.set_ClusterTolerance(0.01)
+        ec.set_MinClusterSize(100)
+        ec.set_MaxClusterSize(50000)
         # Search the k-d tree for clusters
         ec.set_SearchMethod(tree)
         # Extract indices for each of the discovered clusters
@@ -253,9 +253,9 @@ if __name__ == '__main__':
         pcl_cluster_pub = rospy.Publisher("/pcl_cluster", PointCloud2, queue_size=10)
 
     # TODO: Load Model From disk
-        model = pickle.load(open('model1.sav', 'rb'))
+        #model = pickle.load(open('model1.sav', 'rb'))
         #model = pickle.load(open('model2.sav', 'rb'))
-        #model = pickle.load(open('model3.sav', 'rb'))
+        model = pickle.load(open('model3.sav', 'rb'))
         clf = model['classifier']
         encoder = LabelEncoder()
         encoder.classes_ = model['classes']
